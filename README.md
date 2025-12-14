@@ -1,10 +1,6 @@
 # My Soft Systems Integration for Home Assistant
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
-[![GitHub release](https://img.shields.io/github/release/onoffautomations/my_soft_systems.svg)](https://github.com/onoffautomations/my_soft_systems/releases)
-[![License](https://img.shields.io/github/license/onoffautomations/my_soft_systems.svg)](LICENSE)
-
-Home Assistant integration for **My Soft Systems** (OnOff Automations) door control system. Control your doors with automatic detection from SQL Server database or manual configuration.
+Home Assistant integration for **My Soft Systems** Mikvah door control system.
 
 ## Features
 
