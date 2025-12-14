@@ -136,7 +136,28 @@ class _MSSDoorButton(ButtonEntity):
                     else:
                         self._last_status = f"HTTP {resp.status}: {text[:200]}"
                         _LOGGER.warning("MSS door action '%s' failed: %s %s", self._key, resp.status, text)
-        except (ClientError, asyncio.TimeoutError) as err:
-            self._last_status = f"Error: {err}"
-            _LOGGER.error("MSS door action '%s' error: %s", self._key, err)
+        except asyncio.TimeoutError as err:
+            self._last_status = "Error: Request timed out after 10 seconds"
+            _LOGGER.error(
+                "MSS door action '%s' timeout - URL: %s - Error: %s",
+                self._key,
+                self._url,
+                type(err).__name__
+            )
+        except ClientError as err:
+            self._last_status = f"Error: {type(err).__name__} - {err}"
+            _LOGGER.error(
+                "MSS door action '%s' client error - URL: %s - Error type: %s - Details: %s",
+                self._key,
+                self._url,
+                type(err).__name__,
+                str(err) if str(err) else "No error details available"
+            )
+        except Exception as err:
+            self._last_status = f"Unexpected error: {type(err).__name__} - {err}"
+            _LOGGER.exception(
+                "MSS door action '%s' unexpected error - URL: %s",
+                self._key,
+                self._url
+            )
         self.async_write_ha_state()
