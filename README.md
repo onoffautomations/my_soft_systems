@@ -211,3 +211,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 📱 Device creation with 4 control buttons per door
 - ⚡ Pure Python SQL connectivity (python-tds)
 - 🔧 Select all/deselect all door import toggle
+
+Sometimes uses port 4226
