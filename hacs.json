@@ -1,0 +1,7 @@
+{
+  "name": "My Soft Systems Home Assistant Integration",
+  "zip_release": true,
+  "filename": "my_soft_systems.zip",
+  "homeassistant": "2023.8.0",
+  "render_readme": true
+}
