@@ -519,12 +519,12 @@ class MySoftSystemsOptionsFlow(config_entries.OptionsFlow):
 
         # Update title if needed
         if door_name and door_name != self.entry.title:
-            await self.hass.config_entries.async_update_entry(self.entry, title=door_name)
+            self.hass.config_entries.async_update_entry(self.entry, title=door_name)
 
         # Update unique_id if key fields changed
         new_uid = f"{hub_ip}:{hub_port}:{door_id}"
         if self.entry.unique_id != new_uid:
-            await self.hass.config_entries.async_update_entry(self.entry, unique_id=new_uid)
+            self.hass.config_entries.async_update_entry(self.entry, unique_id=new_uid)
 
         # Store changes in options (setup code merges data+options)
         return self.async_create_entry(
