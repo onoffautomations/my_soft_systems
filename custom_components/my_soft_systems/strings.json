@@ -1,0 +1,70 @@
+{
+  "title": "My Soft Systems",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Setup Mode",
+        "description": "Choose how to configure your doors.",
+        "data": {
+          "mode": "Configuration Mode"
+        }
+      },
+      "database": {
+        "title": "Database Connection",
+        "description": "Connect to the database to auto-detect doors. Please enter your hub and database connection details.",
+        "data": {
+          "hub_ip": "Hub IP or Hostname",
+          "hub_port": "Hub Port",
+          "db_host": "Database Host",
+          "db_port": "Database Port",
+          "db_name": "Database Name",
+          "db_user": "Database Username",
+          "db_password": "Database Password"
+        }
+      },
+      "select_doors": {
+        "title": "Select Doors to Import",
+        "description": "Found {door_count} doors.\n\n• Check 'Import all doors' to import everything\n• Or uncheck it and select individual doors below\n\nEach door creates a device with 4 control buttons.",
+        "data": {
+          "import_all_doors": "Import all doors (uncheck to select individually)"
+        }
+      },
+      "manual": {
+        "title": "Add a Door Manually",
+        "description": "Create a device with 4 control buttons for this door.",
+        "data": {
+          "hub_ip": "Hub IP or Hostname",
+          "hub_port": "Hub Port",
+          "door_id": "Door ID",
+          "door_name": "Door Name"
+        }
+      }
+    },
+    "error": {
+      "invalid_host": "Invalid IP address or hostname",
+      "invalid_port": "Invalid port number",
+      "required": "This field is required",
+      "cannot_connect": "Cannot connect to database or no doors found"
+    },
+    "abort": {
+      "no_doors_selected": "No doors were selected",
+      "already_configured": "This door is already configured",
+      "unknown": "Unknown error occurred",
+      "doors_imported": "Successfully imported selected doors",
+      "invalid_import": "Invalid import configuration"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Reconfigure Door",
+        "data": {
+          "hub_ip": "Hub IP or Hostname",
+          "hub_port": "Hub Port",
+          "door_id": "Door ID",
+          "door_name": "Door Name"
+        }
+      }
+    }
+  }
+}
