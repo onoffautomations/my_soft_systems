@@ -32,11 +32,6 @@ Each door device includes 4 buttons:
 7. Click **INSTALL**
 8. Restart Home Assistant
 
-### Manual Installation
-
-1. Copy the `my_soft_systems` folder to your `config/custom_components/` directory
-2. Restart Home Assistant
-3. Add integration via UI
 
 ## Configuration
 
@@ -52,7 +47,7 @@ Each door device includes 4 buttons:
    - **Database Host**: SQL Server host (default: `mikvah-pc`)
    - **Database Port**: SQL Server port (default: `1433`)
    - **Database Name**: Database name (default: `MyKehila`)
-   - **Database Username**: SQL username (default: `mysoft`)
+   - **Database Username**: SQL username
    - **Database Password**: Your SQL password
 6. Select which doors to import:
    - ✅ Check **"Import all doors"** to import everything
@@ -67,7 +62,7 @@ Each door device includes 4 buttons:
 4. Select **Manual configuration**
 5. Fill in the details:
    - **Hub IP/Hostname**: Your hub address (default: `mikvah-pc`)
-   - **Hub Port**: Hub port number (default: `4960`)
+   - **Hub Port**: Hub port number (default: `4960` or `4226`)
    - **Door ID**: The unique door identifier (from your system)
    - **Door Name**: A friendly name for the door
 6. Click **SUBMIT**
@@ -97,31 +92,6 @@ After configuration, each door appears as a **device** in Home Assistant with 4 
    • button.front_door_close_if_open_for_1_entry
 ```
 
-### Example Automation
-
-```yaml
-automation:
-  - alias: "Open Front Door at 8 AM"
-    trigger:
-      - platform: time
-        at: "08:00:00"
-    action:
-      - service: button.press
-        target:
-          entity_id: button.front_door_open_till_next_schedule
-```
-
-### Example Dashboard Card
-
-```yaml
-type: entities
-title: Front Door Controls
-entities:
-  - button.front_door_open_till_next_schedule
-  - button.front_door_close_back_to_schedule
-  - button.front_door_open_for_1_entry
-  - button.front_door_close_if_open_for_1_entry
-```
 
 ## API Endpoints
 
@@ -211,5 +181,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 📱 Device creation with 4 control buttons per door
 - ⚡ Pure Python SQL connectivity (python-tds)
 - 🔧 Select all/deselect all door import toggle
-
-Sometimes uses port 4226
