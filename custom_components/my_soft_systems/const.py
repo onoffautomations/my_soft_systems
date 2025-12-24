@@ -17,6 +17,7 @@ DEFAULT_HUB_HOST = "mikvah-pc"
 DEFAULT_DB_HOST = "mikvah-pc"
 DEFAULT_DB_PORT = 1433
 DEFAULT_DB_NAME = "MyKehila"
-DEFAULT_DB_USER = "mysoft"
+DEFAULT_DB_USER = ""
 
 PLATFORMS = ["button"]
+
