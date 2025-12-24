@@ -48,6 +48,60 @@ def _is_pymssql_available() -> bool:
         return False
 
 
+async def _fetch_port_from_db(
+    hass: HomeAssistant,
+    host: str,
+    port: int,
+    database: str,
+    username: str,
+    password: str,
+) -> int | None:
+    """Fetch ServerWebServicePort from SQL Server database using python-tds."""
+    try:
+        import pytds
+
+        def _query_port():
+            """Query port in executor."""
+            conn = None
+            try:
+                # Connect to SQL Server using python-tds
+                conn = pytds.connect(
+                    server=host,
+                    port=port,
+                    database=database,
+                    user=username,
+                    password=password,
+                    timeout=10,
+                    autocommit=True,
+                )
+                cursor = conn.cursor()
+
+                # Query ServerWebServicePort from GlobalControl
+                query = "SELECT ServerWebServicePort FROM dbo.GlobalControl;"
+                cursor.execute(query)
+
+                # Fetch the result
+                row = cursor.fetchone()
+                if row and row[0]:
+                    return int(row[0])
+                return None
+            except Exception as err:
+                _LOGGER.error("Database port query failed: %s", err)
+                raise
+            finally:
+                if conn:
+                    conn.close()
+
+        # Run database query in executor to avoid blocking
+        return await hass.async_add_executor_job(_query_port)
+    except ImportError:
+        _LOGGER.error("python-tds not installed")
+        return None
+    except Exception as err:
+        _LOGGER.error("Failed to fetch port: %s", err)
+        return None
+
+
 async def _fetch_doors_from_db(
     hass: HomeAssistant,
     host: str,
@@ -200,11 +254,10 @@ class MySoftSystemsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is None:
-            # Show database connection form
+            # Show database connection form (hub port will be auto-detected)
             data_schema = vol.Schema(
                 {
                     vol.Required(CONF_HUB_IP, default=DEFAULT_HUB_HOST): cv.string,
-                    vol.Required(CONF_HUB_PORT, default=DEFAULT_PORT): int,
                     vol.Required(CONF_DB_HOST, default=DEFAULT_DB_HOST): cv.string,
                     vol.Required(CONF_DB_PORT, default=DEFAULT_DB_PORT): int,
                     vol.Required(CONF_DB_NAME, default=DEFAULT_DB_NAME): cv.string,
@@ -216,16 +269,9 @@ class MySoftSystemsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         # Validate hub connection details
         hub_ip = (user_input.get(CONF_HUB_IP) or "").strip()
-        hub_port = user_input.get(CONF_HUB_PORT, DEFAULT_PORT)
 
         if not _is_valid_ip_or_host(hub_ip):
             errors[CONF_HUB_IP] = "invalid_host"
-        try:
-            hub_port = int(hub_port)
-            if hub_port < 1 or hub_port > 65535:
-                errors[CONF_HUB_PORT] = "invalid_port"
-        except (TypeError, ValueError):
-            errors[CONF_HUB_PORT] = "invalid_port"
 
         # Validate database connection details
         db_host = (user_input.get(CONF_DB_HOST) or "").strip()
@@ -254,7 +300,6 @@ class MySoftSystemsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema = vol.Schema(
                 {
                     vol.Required(CONF_HUB_IP, default=hub_ip): cv.string,
-                    vol.Required(CONF_HUB_PORT, default=hub_port): int,
                     vol.Required(CONF_DB_HOST, default=db_host): cv.string,
                     vol.Required(CONF_DB_PORT, default=db_port): int,
                     vol.Required(CONF_DB_NAME, default=db_name): cv.string,
@@ -263,6 +308,17 @@ class MySoftSystemsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 }
             )
             return self.async_show_form(step_id="database", data_schema=data_schema, errors=errors)
+
+        # Auto-detect hub port from database
+        hub_port = await _fetch_port_from_db(
+            self.hass, db_host, db_port, db_name, db_user, db_password
+        )
+
+        if hub_port is None:
+            _LOGGER.warning("Could not auto-detect hub port, using default: %s", DEFAULT_PORT)
+            hub_port = DEFAULT_PORT
+        else:
+            _LOGGER.info("Auto-detected hub port from database: %s", hub_port)
 
         # Try to fetch doors from database
         doors = await _fetch_doors_from_db(
@@ -274,7 +330,6 @@ class MySoftSystemsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema = vol.Schema(
                 {
                     vol.Required(CONF_HUB_IP, default=hub_ip): cv.string,
-                    vol.Required(CONF_HUB_PORT, default=hub_port): int,
                     vol.Required(CONF_DB_HOST, default=db_host): cv.string,
                     vol.Required(CONF_DB_PORT, default=db_port): int,
                     vol.Required(CONF_DB_NAME, default=db_name): cv.string,
